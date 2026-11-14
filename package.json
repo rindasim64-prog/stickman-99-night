@@ -1,0 +1,19 @@
+{
+  "name": "stickman-99-nights",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "STICKMAN: 99 NIGHTS - a 3D browser survival game (Stage 1 prototype)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node tests/prototype.test.mjs"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.3"
+  }
+}

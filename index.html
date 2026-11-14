@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b1220" />
+    <meta name="application-name" content="STICKMAN 99 NIGHTS" />
+    <link rel="icon" type="image/png" href="/assets/app-icon.png" />
+    <link rel="apple-touch-icon" href="/assets/app-icon.png" />
+    <title>STICKMAN 99 NIGHTS</title>
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+
+    <div id="hud" class="hidden">
+      <div class="stats">
+        <div class="bar"><span class="bar-label">HEALTH</span><div class="bar-track"><div id="bar-health" class="bar-fill health"></div></div></div>
+        <div class="bar"><span class="bar-label">HUNGER</span><div class="bar-track"><div id="bar-hunger" class="bar-fill hunger"></div></div></div>
+        <div class="bar"><span class="bar-label">THIRST</span><div class="bar-track"><div id="bar-thirst" class="bar-fill thirst"></div></div></div>
+        <div class="bar"><span class="bar-label">STAMINA</span><div class="bar-track"><div id="bar-stamina" class="bar-fill stamina"></div></div></div>
+      </div>
+      <div id="clock">Day 1</div>
+      <div id="weather">☀️ Clear skies</div>
+      <div id="objective"></div>
+      <div id="fps">-- fps</div>
+      <div id="inventory" class="hidden">
+        <h3>Inventory</h3>
+        <ul id="inv-list"></ul>
+        <p class="hint">Q: eat food · G: craft spear · V: attack · B: shelter · C: campfire · I: close</p>
+      </div>
+      <div id="toast"></div>
+      <div id="mobile-controls" class="mobile-controls hidden" aria-label="Touch controls">
+        <div id="joystick" class="joystick" aria-label="Movement joystick"><div id="joystick-knob"></div></div>
+        <div class="mobile-actions">
+          <button class="touch-btn touch-small" data-key="KeyF" type="button">Light</button>
+          <button class="touch-btn touch-small" data-key="KeyQ" type="button">Eat</button>
+          <button class="touch-btn touch-primary" data-key="KeyE" type="button">Collect</button>
+          <button class="touch-btn touch-primary" data-key="Space" type="button">Jump</button>
+          <button class="touch-btn" data-key="KeyV" type="button">Attack</button>
+          <button class="touch-btn" data-key="ShiftLeft" data-hold="true" type="button">Run</button>
+          <button class="touch-btn touch-small" data-key="KeyG" type="button">Spear</button>
+          <button class="touch-btn touch-small" data-key="KeyC" type="button">Fire</button>
+          <button class="touch-btn touch-small" data-key="KeyB" type="button">Shelter</button>
+          <button class="touch-btn touch-small" data-key="KeyI" type="button">Bag</button>
+          <button id="mobile-pause" class="touch-btn touch-small" type="button">Pause</button>
+        </div>
+        <div class="look-hint">Drag the right side to look around</div>
+      </div>
+      <div id="prompt" class="hidden"></div>
+    </div>
+
+    <div id="overlay">
+      <div class="panel">
+        <h1>STICKMAN</h1>
+        <h2>99 NIGHTS</h2>
+        <p id="overlay-msg"></p>
+        <button id="play-btn" type="button">Play</button>
+        <button id="new-btn" type="button" class="secondary hidden">New game (erases save)</button>
+        <table class="controls">
+          <tr><td>W A S D</td><td>Move</td></tr>
+          <tr><td>Mouse</td><td>Look around</td></tr>
+          <tr><td>Shift</td><td>Sprint (uses stamina)</td></tr>
+          <tr><td>Space</td><td>Jump</td></tr>
+          <tr><td>E</td><td>Collect / drink at the lake</td></tr>
+          <tr><td>Q</td><td>Eat berries or raw meat</td></tr>
+          <tr><td>C</td><td>Craft campfire (5 wood + 3 stone)</td></tr>
+          <tr><td>G</td><td>Craft spear (3 wood + 2 stone)</td></tr>
+          <tr><td>V</td><td>Attack with spear</td></tr>
+          <tr><td>B</td><td>Build shelter (10 wood + 6 stone)</td></tr>
+          <tr><td>E</td><td>Collect resources, drink, or hunt deer (with spear)</td></tr>
+          <tr><td>F</td><td>Toggle flashlight (aim at the monster to repel it)</td></tr>
+          <tr><td>I</td><td>Inventory</td></tr>
+          <tr><td>Esc</td><td>Pause</td></tr>
+        </table>
+        <p id="touch-note" class="note hidden">
+          On mobile, use the on-screen joystick and action buttons. Drag the right side of the screen to look around.
+        </p>
+        <p id="error" class="error hidden"></p>
+      </div>
+    </div>
+
+
+    <div id="tutorial" class="tutorial-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+      <div class="tutorial-card">
+        <div class="tutorial-top"><span>FIRST-TIME SURVIVOR GUIDE</span><span id="tutorial-step-count">1 / 7</span></div>
+        <div class="tutorial-progress"><div id="tutorial-progress-fill"></div></div>
+        <div class="tutorial-icon" id="tutorial-icon">🎮</div>
+        <h2 id="tutorial-title">Welcome to the Island</h2>
+        <p id="tutorial-description">Learn the controls and survival basics before your first night.</p>
+        <div id="tutorial-keys" class="tutorial-keys"></div>
+        <div class="tutorial-actions">
+          <button id="tutorial-skip" class="tutorial-skip" type="button">Skip tutorial</button>
+          <button id="tutorial-next" type="button">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
