@@ -1,0 +1,425 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #0b1220;
+  color: #e8ecf5;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- HUD ---------- */
+#hud { position: fixed; inset: 0; pointer-events: none; }
+
+.stats {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: min(220px, 45vw);
+  display: grid;
+  gap: 8px;
+}
+
+.bar-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.8;
+  margin-bottom: 3px;
+}
+
+.bar-track {
+  height: 9px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.bar-fill { height: 100%; width: 100%; transition: background-color 0.2s; }
+.bar-fill.health { background: #e0584c; }
+.bar-fill.hunger { background: #e0a23c; }
+.bar-fill.thirst { background: #4aa8e0; }
+.bar-fill.stamina { background: #5fd38a; }
+.bar-fill.stamina.low { background: #8a8f99; }
+.bar-fill.low:not(.stamina) { animation: pulse 0.8s infinite alternate; }
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.35; } }
+
+#clock {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+#clock.night { color: #aab8ff; }
+
+#weather {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 30px;
+  padding: 3px 11px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.42);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#objective {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90vw;
+  padding: 4px 14px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  text-align: center;
+}
+#objective.done { color: #7be0a0; }
+
+#fps {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 12px;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+#inventory {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 210px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(5, 8, 16, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+#inventory h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; }
+#inventory ul { list-style: none; margin: 0; padding: 0; }
+#inventory li { display: flex; justify-content: space-between; gap: 16px; padding: 3px 0; font-size: 14px; }
+#inventory li.empty { opacity: 0.6; font-size: 13px; }
+#inventory .count { color: #9fb4e8; font-variant-numeric: tabular-nums; }
+#inventory .hint { margin: 8px 0 0; font-size: 12px; opacity: 0.6; }
+
+#prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-weight: 600;
+}
+
+#toast {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.25s;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 14px;
+}
+#toast.show { opacity: 1; }
+
+/* ---------- Overlay / menu ---------- */
+#overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  background: #070b16 url('/assets/title-screen.png') center center / 100% 100% no-repeat;
+}
+
+/* The title-screen artwork already contains the game title and menu artwork.
+   Keep the real Play control transparent and aligned over its illustrated button. */
+.panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  text-align: center;
+}
+.panel > h1, .panel > h2, .panel > #overlay-msg, .panel > .controls, .panel > .note {
+  display: none;
+}
+#play-btn {
+  position: absolute;
+  left: 60.5%;
+  top: 51.5%;
+  width: 25.5%;
+  height: 10%;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  opacity: 0.015;
+  background: #ffb000;
+  color: transparent;
+  cursor: pointer;
+}
+#play-btn:hover, #play-btn:active { opacity: 0.12; transform: none; }
+#new-btn.secondary {
+  position: absolute;
+  left: 60.5%;
+  top: 63%;
+  width: 25.5%;
+  margin: 0;
+  background: rgba(8, 10, 18, .88);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(40px, 9vw, 64px);
+  letter-spacing: 0.12em;
+  font-weight: 800;
+}
+
+h2 {
+  margin: 0 0 18px;
+  font-size: clamp(16px, 4vw, 22px);
+  letter-spacing: 0.5em;
+  font-weight: 600;
+  color: #9fb4e8;
+}
+
+#overlay-msg { margin: 0 0 18px; opacity: 0.85; }
+
+#play-btn {
+  font: inherit;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  padding: 12px 44px;
+  color: #0b1220;
+  background: #e8ecf5;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.15s;
+}
+#play-btn:hover { background: #fff; transform: translateY(-1px); }
+#play-btn:active { transform: translateY(0); }
+#play-btn:focus-visible { outline: 3px solid #9fb4e8; outline-offset: 3px; }
+
+.controls {
+  margin: 24px auto 0;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.controls td { padding: 4px 12px; text-align: left; }
+.controls td:first-child { color: #9fb4e8; font-weight: 600; text-align: right; }
+
+.note { font-size: 13px; opacity: 0.8; margin-top: 16px; }
+.error { color: #ff8a80; margin-top: 16px; font-size: 14px; }
+
+#new-btn.secondary {
+  display: block;
+  margin: 12px auto 0;
+  font: inherit;
+  font-size: 13px;
+  color: #e8ecf5;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+#new-btn.secondary:hover { background: rgba(255, 255, 255, 0.1); }
+
+
+/* ---------- First-time tutorial ---------- */
+.tutorial-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(3, 7, 15, 0.88);
+  backdrop-filter: blur(8px);
+}
+.tutorial-card {
+  width: min(520px, 100%);
+  padding: 25px;
+  border: 1px solid rgba(159, 180, 232, 0.35);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #17243a, #0b1220 72%);
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+  text-align: left;
+}
+.tutorial-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #9fb4e8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+.tutorial-progress {
+  height: 5px;
+  margin: 12px 0 20px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(255,255,255,.12);
+}
+#tutorial-progress-fill {
+  width: 14.285%;
+  height: 100%;
+  border-radius: inherit;
+  background: #8fb5ff;
+  transition: width .2s ease;
+}
+.tutorial-icon { font-size: 38px; margin-bottom: 8px; }
+.tutorial-card h2 {
+  margin: 0 0 9px;
+  color: #f4f6fb;
+  font-size: 25px;
+  letter-spacing: 0;
+}
+.tutorial-card p {
+  margin: 0 0 16px;
+  color: #c5cede;
+  line-height: 1.55;
+  font-size: 14px;
+}
+.tutorial-keys {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 22px;
+}
+.tutorial-key-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 9px;
+  background: rgba(255,255,255,.045);
+  font-size: 13px;
+  color: #e8ecf5;
+}
+.tutorial-key-row strong {
+  flex: 0 0 112px;
+  color: #a9c4ff;
+  font-size: 12px;
+}
+.tutorial-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#tutorial-next {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 24px;
+  background: #e8ecf5;
+  color: #0b1220;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.tutorial-skip {
+  border: 0;
+  padding: 10px 0;
+  background: transparent;
+  color: #aebbd2;
+  font: inherit;
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  .tutorial-card { padding: 19px; }
+  .tutorial-card h2 { font-size: 21px; }
+  .tutorial-key-row { font-size: 12px; }
+  .tutorial-key-row strong { flex-basis: 88px; }
+}
+
+
+/* ---------- Mobile touch controls ---------- */
+.mobile-controls { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+.joystick {
+  position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom));
+  width: 128px; height: 128px; border-radius: 50%; pointer-events: auto; touch-action: none;
+  background: rgba(10, 18, 32, .38); border: 2px solid rgba(255,255,255,.42);
+  box-shadow: inset 0 0 0 10px rgba(255,255,255,.05); backdrop-filter: blur(3px);
+}
+#joystick-knob { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; border-radius: 50%;
+  transform: translate(-50%, -50%); background: rgba(210,225,255,.82); border: 2px solid #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,.35); }
+.mobile-actions { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  width: min(44vw, 250px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; pointer-events: auto; }
+.touch-btn { min-height: 43px; padding: 7px 5px; border-radius: 13px; border: 1px solid rgba(255,255,255,.45);
+  background: rgba(16, 29, 49, .78); color: #fff; font: 700 11px system-ui, sans-serif; text-shadow: 0 1px 2px #000;
+  box-shadow: 0 3px 10px rgba(0,0,0,.25); touch-action: none; -webkit-tap-highlight-color: transparent; }
+.touch-btn:active, .touch-btn.pressed { background: rgba(116,157,226,.92); transform: scale(.96); }
+.touch-primary { background: rgba(67, 105, 166, .86); min-height: 49px; }
+.touch-small { min-height: 36px; font-size: 10px; }
+.look-hint { position: absolute; right: 16px; bottom: max(205px, calc(env(safe-area-inset-bottom) + 190px));
+  color: rgba(255,255,255,.68); font-size: 10px; text-shadow: 0 1px 3px #000; pointer-events: none; }
+@media (pointer: coarse) {
+  .mobile-controls { display: block !important; }
+  .mobile-controls.hidden { display: none !important; }
+  #fps { display: none; }
+  .stats { left: max(8px, env(safe-area-inset-left)); top: max(8px, env(safe-area-inset-top)); width: min(145px, 38vw); gap: 5px; }
+  .bar-track { height: 7px; }
+  .bar-label { font-size: 8px; margin-bottom: 1px; }
+  #clock { top: max(8px, env(safe-area-inset-top)); font-size: 11px; padding: 4px 8px; }
+  #weather { top: max(8px, env(safe-area-inset-top)); margin-top: 24px; font-size: 10px; }
+  #objective { top: 61px; font-size: 10px; max-width: 92vw; }
+  #inventory { right: 8px; top: 80px; transform: none; min-width: 150px; max-width: 48vw; padding: 8px 10px; }
+  #inventory li { font-size: 11px; }
+  #prompt { bottom: 29%; font-size: 12px; max-width: 75vw; text-align: center; }
+  #toast { bottom: 35%; font-size: 12px; }
+  .controls { display: none; }
+  .panel { max-height: 88dvh; overflow-y: auto; }
+  .tutorial-card { max-height: 90dvh; overflow-y: auto; }
+}
+@media (max-width: 390px) and (pointer: coarse) {
+  .joystick { width: 108px; height: 108px; }
+  #joystick-knob { width: 46px; height: 46px; }
+  .mobile-actions { width: 47vw; gap: 5px; }
+  .touch-btn { min-height: 39px; font-size: 10px; }
+}
+
+/* Portrait phones: keep the full artwork visible and place the Play hit-area over its menu button. */
+@media (max-aspect-ratio: 3/4) {
+  #overlay { background-size: auto 100%; background-position: 38% center; }
+  #play-btn { left: 57%; top: 54%; width: 35%; height: 9%; }
+  #new-btn.secondary { left: 57%; top: 65%; width: 35%; }
+}
